@@ -6,20 +6,22 @@
     <Timer @timeExpired="gameOver" />
 
     <div class="text-center bg-blue-500 p-3">
-      <span
-        v-for="(character, index) in currentWord"
-        :key="index"
-        :class="[
-          index < tmpIndex ? 'text-green-300' : 'text-white',
-          'mt-2 text-3xl mb-3'
-        ]"
-      >
-        {{ character }}
-      </span>
+      <div class="word-container">
+        <span
+          v-for="(character, index) in currentWord"
+          :key="index"
+          :class="[
+            index < tmpIndex ? 'text-green-300' : 'text-white',
+            'character'
+          ]"
+        >
+          {{ character }}
+        </span>
+      </div>
     </div>
-    <p class="mt-1 p-2 select-none text-2xl text-center bg-gray-500 text-white">{{ currentJa }}</p>
-    <div>
-    </div>
+
+    <p class="mt-1 p-2 select-none text-center bg-gray-500 text-white japanese-text">{{ currentJa }}</p>
+
     <p class="text-center text-5xl">{{ result }}</p>
     <br>
     <div>
@@ -34,8 +36,6 @@
       </p>
     </div>
   </div>
-
-  <!-- TODO スコア登録データベース処理 -->
 </template>
 
 <script setup lang="ts">
@@ -48,14 +48,34 @@ const userInputRef = ref(null)
 const startTime = ref(0)
 const endTime = ref(0)
 
-// 音声ファイルのURL
+const words = ref<string[][]>([])
+const isDataLoaded = ref(false)
+
+async function fetchData() {
+  try {
+    const response = await fetch('http://localhost:4000/api/v1/quotes?purpose=typing')
+    const data = await response.json()
+
+    if (data && Array.isArray(data) && data.length > 0) {
+      words.value = data
+    } else {
+      words.value = WORDS
+    }
+  } catch (error) {
+    console.error('Fetch error:', error)
+    words.value = WORDS
+  } finally {
+    isDataLoaded.value = true
+    startGame()
+  }
+}
+
 const soundFiles = {
   correct: '/audio/correctSound.mp3',
   incorrect: 'audio/incorrectSound.mp3',
   finish: 'audio/finish.mp3',
 };
 
-// 音を再生する関数
 const playSound = (soundName) => {
    const audio = ref(new Audio());
    const audioElement = audio.value;
@@ -63,13 +83,12 @@ const playSound = (soundName) => {
    audioElement.play();
 };
 
-// ユーザーの入力を監視してuserInputの値を更新
 const updateUserInput = () => {
   userInput.value = userInputRef.value.value;
 }
+
 const isPlaying = ref(false)
-const targetBackground = ref('white') // 初期の背景色
-const words: string[][] = WORDS
+const targetBackground = ref('white')
 
 const changeBackground = (color) => {
   targetBackground.value = color
@@ -80,27 +99,29 @@ const result = ref('')
 const currentWordIndex = ref(0)
 
 const currentWord = computed(() => {
-  return words[currentWordIndex.value][0];
+  if (!words.value || !words.value[currentWordIndex.value]) return '';
+  return words.value[currentWordIndex.value][0] || '';
 })
+
 const currentJa = computed(() => {
-  return words[currentWordIndex.value][1]
+  if (!words.value || !words.value[currentWordIndex.value]) return '';
+  return words.value[currentWordIndex.value][1] || '';
 })
 
 const word = computed(() => {
-  return currentWord.value.substring(userInput.value);
+  return currentWord.value.substring(userInput.value.length);
 })
 
 const isTargetVisible = computed(() => {
-  return isPlaying.value && word.value.length > 0;
+  return isPlaying.value && isDataLoaded.value && word.value.length > 0;
 })
 
-const totalWords = computed(() => words.length)
+const totalWords = computed(() => words.value.length)
 const tmpIndex = ref(0)
 
 const mistakesCount = ref(0)
 const totalKeyPresses = ref(0)
 
-// 間違ったキーの割合を使って正確度を計算
 const typingAccuracy = computed(() => {
   return totalKeyPresses.value > 0
     ? ((1 - mistakesCount.value / totalKeyPresses.value) * 100).toFixed(2)
@@ -114,10 +135,17 @@ const gameOver = () => {
 }
 
 const saveScore = async (totalTime) => {
-  const { data, error } = await useFetch('http://localhost:3000/results', {
-    method: 'post',
-    body: { score: totalTime }
-  })
+  try {
+    const { data, error } = await useFetch('http://localhost:3000/results', {
+      method: 'post',
+      body: { score: totalTime }
+    })
+    if (error) {
+      console.error('Score save error:', error)
+    }
+  } catch (e) {
+    console.error('Failed to save score:', e)
+  }
 }
 
 const handleKeyDown = (event) => {
@@ -126,7 +154,8 @@ const handleKeyDown = (event) => {
   }
   totalKeyPresses.value += 1
 
-  if (event.key === word.value[tmpIndex.value]) {
+  const nextChar = word.value[0]
+  if (event.key === nextChar) {
     playSound('correct')
     changeBackground('skyblue')
     userInput.value += event.key;
@@ -141,11 +170,11 @@ const handleKeyDown = (event) => {
     if (currentWordIndex.value < totalWords.value - 1) {
       userInputRef.value.value = ""
       tmpIndex.value = 0
-      currentWordIndex.value += 1; // 次の単語を表示
+      currentWordIndex.value += 1;
       userInput.value = "";
     } else {
-      // 全ての単語を入力し終わったら "Success" を表示
-      endTime.value = Date.now() // ゲーム終了時刻を記録
+
+      endTime.value = Date.now()
       const totalTime = endTime.value - startTime.value
       playSound('finish')
       result.value = `クリア Total Time: ${totalTime / 1000} seconds 間違いの数は、${mistakesCount.value}回です。正確度は、${typingAccuracy.value}%です。`
@@ -156,11 +185,13 @@ const handleKeyDown = (event) => {
 }
 
 const startGame = () => {
+  if (!isDataLoaded.value || words.value.length === 0) return;
+
   isPlaying.value = true
   currentWordIndex.value = 0
   userInput.value = ""
   result.value = ""
-  startTime.value = Date.now() // ゲーム開始時刻を記録
+  startTime.value = Date.now()
 }
 
 const restartGame = () => {
@@ -168,6 +199,37 @@ const restartGame = () => {
 }
 
 onMounted(() => {
-  startGame()
+  fetchData()
 })
 </script>
+
+<style scoped>
+.word-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 2px;
+  max-width: 100%;
+}
+
+.character {
+  font-size: 1.5rem;
+  display: inline-block;
+}
+
+.japanese-text {
+  font-size: 1.25rem;
+  word-break: break-all;
+  white-space: normal;
+  line-height: 1.5;
+}
+
+@media (max-width: 768px) {
+  .character {
+    font-size: 1.25rem;
+  }
+  .japanese-text {
+    font-size: 1rem;
+  }
+}
+</style>
