@@ -1,6 +1,6 @@
 export const useApiFetch = () => {
   const apiFetch = $fetch.create({
-    baseURL: 'http://localhost:3000',
+    baseURL: 'http://localhost:4000',
   })
   return { apiFetch }
 }
