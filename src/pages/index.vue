@@ -4,11 +4,31 @@
     <h2 class="m-2">
       あなたのタイピングスピードを至高に
     </h2>
-    <button class="bg-gray-500 hover:bg-blue-700 text-white font-bold m-2 py-2 px-4 rounded"
-      @click="challenge"
-    >
-      腕試しチャレンジ
-    </button>
+    <div class="flex flex-col items-center space-y-4">
+      <button class="bg-gray-500 hover:bg-blue-700 text-white font-bold m-2 py-2 px-4 rounded"
+        @click="challenge"
+      >
+        腕試しチャレンジ（文学作品）
+      </button>
+      
+      <button class="bg-green-500 hover:bg-green-700 text-white font-bold m-2 py-2 px-4 rounded"
+        @click="kanjiPractice"
+      >
+        漢字練習
+      </button>
+      
+      <button class="bg-purple-500 hover:bg-purple-700 text-white font-bold m-2 py-2 px-4 rounded"
+        @click="jukugoPractice"
+      >
+        熟語練習
+      </button>
+      
+      <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold m-2 py-2 px-4 rounded"
+        @click="viewLeaderboard"
+      >
+        ランキング
+      </button>
+    </div>
   </div>
 </template>
 
@@ -19,6 +39,18 @@ useHead({
 
 const challenge = () => {
   navigateTo('/skilltest1')
+}
+
+const kanjiPractice = () => {
+  navigateTo('/kanji-practice')
+}
+
+const jukugoPractice = () => {
+  navigateTo('/jukugo-practice')
+}
+
+const viewLeaderboard = () => {
+  navigateTo('/leaderboard')
 }
 </script>
 
