@@ -34,7 +34,7 @@
     "typescript": "^5.8.3",
     "vitest": "^0.34.6",
     "vue": "^3.3.7",
-    "vue-router": "^4.2.5",
+    "vue-router": "^4.5.1",
     "vue-tsc": "^2.2.10"
   },
   "dependencies": {
