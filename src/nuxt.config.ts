@@ -8,4 +8,14 @@ export default defineNuxtConfig({
       autoprefixer: {},
     },
   },
+  runtimeConfig: {
+    public: {
+      apiBase: process.env.NUXT_PUBLIC_API_BASE || 'http://localhost:4000',
+    },
+  },
+  typescript: {
+    strict: false,
+    typeCheck: false,
+  },
+  ssr: false, // SPAモードで動作
 })

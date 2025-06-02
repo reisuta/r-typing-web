@@ -1,14 +1,16 @@
 <template>
-  <h1 id="title">腕試しをしてみよう！</h1>
-  <hr>
-  <br><br>
+  <h1 id="title">
+    腕試しをしてみよう！
+  </h1>
+  <hr />
+  <br /><br />
   <div id="parent">
-  <p>応用練習</p>
+    <p>応用練習</p>
   </div>
-  <br>
-  <br>
+  <br />
+  <br />
   <div id="start">
     <!--タイピング画面に遷移 -->
   </div>
-  <br>
+  <br />
 </template>

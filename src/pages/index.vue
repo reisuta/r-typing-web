@@ -1,41 +1,67 @@
 <template>
-  <div>
-    <h1 class="text-3xl m-3 font-bold">AT-typing！</h1>
-    <h2 class="m-2">
-      あなたのタイピングスピードを至高に
-    </h2>
-    <div class="flex flex-col items-center space-y-4">
-      <button class="bg-gray-500 hover:bg-blue-700 text-white font-bold m-2 py-2 px-4 rounded"
-        @click="challenge"
-      >
-        腕試しチャレンジ（文学作品）
-      </button>
+  <div class="min-h-screen bg-gray-50">
+    <div class="container mx-auto px-4 py-8">
+      <div class="text-center mb-8">
+        <h1 class="text-4xl font-bold text-gray-800 mb-2">
+          R-Typing
+        </h1>
+        <h2 class="text-xl text-gray-600">
+          あなたのタイピングスピードを至高に
+        </h2>
+      </div>
       
-      <button class="bg-green-500 hover:bg-green-700 text-white font-bold m-2 py-2 px-4 rounded"
-        @click="kanjiPractice"
-      >
-        漢字練習
-      </button>
+      <div class="max-w-md mx-auto space-y-4">
+        <button 
+          class="w-full bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-lg transition-colors shadow-md"
+          @click="challenge"
+        >
+          <span class="text-lg">📚 腕試しチャレンジ（文学作品）</span>
+        </button>
+        
+        <button 
+          class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-lg transition-colors shadow-md"
+          @click="kanjiPractice"
+        >
+          <span class="text-lg">🈲 漢字練習</span>
+        </button>
+        
+        <button 
+          class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-6 rounded-lg transition-colors shadow-md"
+          @click="jukugoPractice"
+        >
+          <span class="text-lg">🈴 熟語練習</span>
+        </button>
+        
+        <button 
+          class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg transition-colors shadow-md"
+          @click="viewLeaderboard"
+        >
+          <span class="text-lg">🏆 ランキング</span>
+        </button>
+        
+        <button 
+          class="w-full bg-gray-500 hover:bg-gray-600 text-white font-bold py-3 px-6 rounded-lg transition-colors shadow-md"
+          @click="viewSettings"
+        >
+          <span class="text-lg">⚙️ 設定</span>
+        </button>
+      </div>
       
-      <button class="bg-purple-500 hover:bg-purple-700 text-white font-bold m-2 py-2 px-4 rounded"
-        @click="jukugoPractice"
-      >
-        熟語練習
-      </button>
-      
-      <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold m-2 py-2 px-4 rounded"
-        @click="viewLeaderboard"
-      >
-        ランキング
-      </button>
+      <div class="text-center mt-8">
+        <p class="text-sm text-gray-500">
+          ようこそ、{{ userName || 'ゲスト' }}さん
+        </p>
+      </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
 useHead({
-    title: 'R-Typing'
+  title: 'R-Typing',
 })
+
+const userName = ref('')
 
 const challenge = () => {
   navigateTo('/skilltest1')
@@ -52,60 +78,13 @@ const jukugoPractice = () => {
 const viewLeaderboard = () => {
   navigateTo('/leaderboard')
 }
+
+const viewSettings = () => {
+  navigateTo('/settings')
+}
+
+onMounted(() => {
+  userName.value = localStorage.getItem('userName') || ''
+})
 </script>
-
-<style>
-#title {
-  font-size:large;
-  background-color: black;
-  color: white;
-  text-align: center;
- }
- 
- #ques{
-   margin-top: 40px;
-   font-size: 20px;
- }
-
- .font {
-   float: left;
-   font-size: 15px;
-   background-color:silver;
-   color: white;
-   width: max-content;
-   border-radius: 5%;
-   margin: 0;
- }
-
- input{
-   float: left;
-   margin-left: 1px;
-   /* color: black; */
- }
-
- .a_tag{
-   text-decoration: none;
-   background-color: skyblue;
-   color:black;
-   font-weight: bold;
-   font-size: large;
-   border-radius: 10%;
- }
-
- #typ a{
-
-  text-decoration: none;
-  background-color: black;
-  color: white;
-  font-size: 30px;
-  border-radius: 5%;
-  border: 1px solid #3c7fb1;
-  padding: 1em;
-  cursor: pointer;
- }
-
- #start{
-   text-align: center;
- }
-</style>
 

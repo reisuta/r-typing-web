@@ -3,7 +3,8 @@
     <div>
       <Header />
     </div>
-    <slot />
-    <footer />
+    <slot></slot>
+    <footer></footer>
+    <NotificationList />
   </div>
 </template>

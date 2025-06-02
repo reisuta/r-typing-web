@@ -1,9 +1,14 @@
 <template>
   <div>
     <div class="text-center">
-      <button class="px-4 py-2 my-3 bg-stone-300 border-rounded text-red-600" @click="restartGame">RESTART</button>
+      <button
+        class="px-4 py-2 my-3 bg-stone-300 border-rounded text-red-600"
+        @click="restartGame"
+      >
+        RESTART
+      </button>
     </div>
-    <Timer @timeExpired="gameOver" />
+    <Timer @time-expired="gameOver" />
 
     <div class="text-center bg-blue-500 p-3">
       <div class="word-container">
@@ -20,18 +25,28 @@
       </div>
     </div>
 
-    <p class="mt-1 p-2 select-none text-center bg-gray-500 text-white japanese-text">{{ currentJa }}</p>
+    <p class="mt-1 p-2 select-none text-center bg-gray-500 text-white japanese-text">
+      {{ currentJa }}
+    </p>
 
-    <p class="text-center text-5xl">{{ result }}</p>
-    <br>
+    <p class="text-center text-5xl">
+      {{ result }}
+    </p>
+    <br />
     <div>
       <p
         v-if="isTargetVisible"
         :style="{ background: targetBackground }"
-        @keydown.prevent="handleKeyDown"
         tabindex="0"
+        @keydown.prevent="handleKeyDown"
       >
-        <input ref="userInputRef" @input="updateUserInput" :value="userInput" class="mb-5 mt-5 select-none text-3xl text-center bg-sky-500 text-white w-full rounded-none border-0" autofocus>
+        <input
+          ref="userInputRef"
+          :value="userInput"
+          class="mb-5 mt-5 select-none text-3xl text-center bg-sky-500 text-white w-full rounded-none border-0"
+          autofocus
+          @input="updateUserInput"
+        />
         <Keyboard />
       </p>
     </div>
@@ -39,9 +54,10 @@
 </template>
 
 <script setup lang="ts">
-import { WORDS } from "../consts/word.ts"
+import { useQuotes } from '~/composables/useQuotes'
+import { useScores } from '~/composables/useScores'
 useHead({
-    title: 'タイピング画面'
+  title: 'タイピング画面',
 })
 
 const userInputRef = ref(null)
@@ -50,20 +66,18 @@ const endTime = ref(0)
 
 const words = ref<string[][]>([])
 const isDataLoaded = ref(false)
+const { fetchTypingQuotes } = useQuotes()
 
-async function fetchData() {
+async function fetchData () {
   try {
-    const response = await fetch('http://localhost:4000/api/v1/quotes?purpose=typing')
-    const data = await response.json()
-
-    if (data && Array.isArray(data) && data.length > 0) {
+    const data = await fetchTypingQuotes(20)
+    if (data && data.length > 0) {
       words.value = data
-    } else {
-      words.value = WORDS
     }
   } catch (error) {
     console.error('Fetch error:', error)
-    words.value = WORDS
+    // フォールバックデータ
+    words.value = [['test', 'テスト']]
   } finally {
     isDataLoaded.value = true
     startGame()
@@ -74,17 +88,17 @@ const soundFiles = {
   correct: '/audio/correctSound.mp3',
   incorrect: 'audio/incorrectSound.mp3',
   finish: 'audio/finish.mp3',
-};
+}
 
 const playSound = (soundName) => {
-   const audio = ref(new Audio());
-   const audioElement = audio.value;
-   audioElement.src = soundFiles[soundName];
-   audioElement.play();
-};
+  const audio = ref(new Audio())
+  const audioElement = audio.value
+  audioElement.src = soundFiles[soundName]
+  audioElement.play()
+}
 
 const updateUserInput = () => {
-  userInput.value = userInputRef.value.value;
+  userInput.value = userInputRef.value.value
 }
 
 const isPlaying = ref(false)
@@ -99,21 +113,21 @@ const result = ref('')
 const currentWordIndex = ref(0)
 
 const currentWord = computed(() => {
-  if (!words.value || !words.value[currentWordIndex.value]) return '';
-  return words.value[currentWordIndex.value][0] || '';
+  if (!words.value || !words.value[currentWordIndex.value]) return ''
+  return words.value[currentWordIndex.value][0] || ''
 })
 
 const currentJa = computed(() => {
-  if (!words.value || !words.value[currentWordIndex.value]) return '';
-  return words.value[currentWordIndex.value][1] || '';
+  if (!words.value || !words.value[currentWordIndex.value]) return ''
+  return words.value[currentWordIndex.value][1] || ''
 })
 
 const word = computed(() => {
-  return currentWord.value.substring(userInput.value.length);
+  return currentWord.value.substring(userInput.value.length)
 })
 
 const isTargetVisible = computed(() => {
-  return isPlaying.value && isDataLoaded.value && word.value.length > 0;
+  return isPlaying.value && isDataLoaded.value && word.value.length > 0
 })
 
 const totalWords = computed(() => words.value.length)
@@ -134,29 +148,22 @@ const gameOver = () => {
   isPlaying.value = false
 }
 
-const saveScore = async (totalTime) => {
+const { createScore } = useScores()
+
+const saveScore = async (totalTime: number) => {
   try {
-    const wpm = (totalWords.value / (totalTime / 60000)) * 5; // Assuming 5 characters per word average
+    const wpm = (totalWords.value / (totalTime / 60000)) * 5 // Assuming 5 characters per word average
     const score = {
-      user_name: 'Anonymous',
-      score_type: 'quotes',
+      user_name: localStorage.getItem('userName') || 'Anonymous',
+      score_type: 'quotes' as const,
       wpm: wpm,
-      accuracy: parseFloat(typingAccuracy.value),
+      accuracy: parseFloat(typingAccuracy.value.toString()),
       time_taken: totalTime / 1000,
-      completed_at: new Date().toISOString()
-    };
-
-    const response = await fetch('http://localhost:4000/api/v1/scores', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ score })
-    });
-
-    if (!response.ok) {
-      console.error('Score save error:', response.statusText);
+      completed_at: new Date().toISOString(),
     }
+
+    await createScore(score)
+    console.log('Score saved successfully')
   } catch (e) {
     console.error('Failed to save score:', e)
   }
@@ -172,7 +179,7 @@ const handleKeyDown = (event) => {
   if (event.key === nextChar) {
     playSound('correct')
     changeBackground('skyblue')
-    userInput.value += event.key;
+    userInput.value += event.key
     tmpIndex.value += 1
   } else {
     playSound('incorrect')
@@ -182,29 +189,29 @@ const handleKeyDown = (event) => {
 
   if (userInput.value === currentWord.value) {
     if (currentWordIndex.value < totalWords.value - 1) {
-      userInputRef.value.value = ""
+      userInputRef.value.value = ''
       tmpIndex.value = 0
-      currentWordIndex.value += 1;
-      userInput.value = "";
+      currentWordIndex.value += 1
+      userInput.value = ''
     } else {
 
       endTime.value = Date.now()
       const totalTime = endTime.value - startTime.value
       playSound('finish')
       result.value = `クリア Total Time: ${totalTime / 1000} seconds 間違いの数は、${mistakesCount.value}回です。正確度は、${typingAccuracy.value}%です。`
-      isPlaying.value = false;
-      saveScore(totalTime / 1000)
+      isPlaying.value = false
+      saveScore(totalTime)
     }
   }
 }
 
 const startGame = () => {
-  if (!isDataLoaded.value || words.value.length === 0) return;
+  if (!isDataLoaded.value || words.value.length === 0) return
 
   isPlaying.value = true
   currentWordIndex.value = 0
-  userInput.value = ""
-  result.value = ""
+  userInput.value = ''
+  result.value = ''
   startTime.value = Date.now()
 }
 
