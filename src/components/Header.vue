@@ -20,15 +20,21 @@
           </p>
         </div>
         <div class="header-upper-right">
-          <NuxtLink to="/practice">基礎練習</NuxtLink>
+          <NuxtLink to="/practice">
+            基礎練習
+          </NuxtLink>
         </div>
 
         <div class="header-upper-right">
-          <NuxtLink to="/diary">日記</NuxtLink>
+          <NuxtLink to="/diary">
+            日記
+          </NuxtLink>
         </div>
 
         <div class="header-upper-right">
-          <NuxtLink to="/skilltest1">腕試しチャレンジ</NuxtLink>
+          <NuxtLink to="/skilltest1">
+            腕試しチャレンジ
+          </NuxtLink>
         </div>
       </div>
     </div>

@@ -1,26 +1,30 @@
 <template>
-  <h1 id="title">腕試しをしてみよう！</h1>
-  <hr>
-  <br><br>
+  <h1 id="title">
+    腕試しをしてみよう！
+  </h1>
+  <hr />
+  <br /><br />
   <div id="parent">
-  <p>腕試しタイピング</p>
+    <p>腕試しタイピング</p>
   </div>
-  <br>
-  <br>
+  <br />
+  <br />
   <div id="start">
     <!-- NuxtLinkだと遷移時に再描画されずにinputタグのautofocusが有効にならないためaタグにする -->
     <a href="/practice">Start</a>
   </div>
-  <br>
+  <br />
   <div id="home">
-  <br><br>
-    <NuxtLink to="/">ホーム画面に戻る</NuxtLink>
+    <br /><br />
+    <NuxtLink to="/">
+      ホーム画面に戻る
+    </NuxtLink>
   </div>
 </template>
 
 <script setup lang="ts">
 useHead({
-    title: 'Start!'
+  title: 'Start!',
 })
 </script>
 

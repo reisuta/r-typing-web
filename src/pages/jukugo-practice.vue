@@ -26,7 +26,7 @@
     </div>
 
     <p class="mt-1 p-2 select-none text-center bg-gray-500 text-white japanese-text">
-      {{ currentJa }}
+      {{ currentJukugo }} - {{ currentMeaning }}
     </p>
 
     <p class="text-center text-5xl">
@@ -54,30 +54,30 @@
 </template>
 
 <script setup lang="ts">
-import { useQuotes } from '~/composables/useQuotes'
+import { useJukugos } from '~/composables/useJukugos'
 import { useScores } from '~/composables/useScores'
 useHead({
-  title: 'タイピング画面',
+  title: '熟語タイピング練習',
 })
 
 const userInputRef = ref(null)
 const startTime = ref(0)
 const endTime = ref(0)
 
-const words = ref<string[][]>([])
+const jukugos = ref<string[][]>([])
 const isDataLoaded = ref(false)
-const { fetchTypingQuotes } = useQuotes()
+const { fetchTypingJukugos } = useJukugos()
 
 async function fetchData () {
   try {
-    const data = await fetchTypingQuotes(20)
+    const data = await fetchTypingJukugos(20)
     if (data && data.length > 0) {
-      words.value = data
+      jukugos.value = data
     }
   } catch (error) {
     console.error('Fetch error:', error)
     // フォールバックデータ
-    words.value = [['test', 'テスト']]
+    jukugos.value = [['nihongo', '日本語', 'Japanese language']]
   } finally {
     isDataLoaded.value = true
     startGame()
@@ -113,13 +113,18 @@ const result = ref('')
 const currentWordIndex = ref(0)
 
 const currentWord = computed(() => {
-  if (!words.value || !words.value[currentWordIndex.value]) return ''
-  return words.value[currentWordIndex.value][0] || ''
+  if (!jukugos.value || !jukugos.value[currentWordIndex.value]) return ''
+  return jukugos.value[currentWordIndex.value][0] || ''
 })
 
-const currentJa = computed(() => {
-  if (!words.value || !words.value[currentWordIndex.value]) return ''
-  return words.value[currentWordIndex.value][1] || ''
+const currentJukugo = computed(() => {
+  if (!jukugos.value || !jukugos.value[currentWordIndex.value]) return ''
+  return jukugos.value[currentWordIndex.value][1] || ''
+})
+
+const currentMeaning = computed(() => {
+  if (!jukugos.value || !jukugos.value[currentWordIndex.value]) return ''
+  return jukugos.value[currentWordIndex.value][2] || ''
 })
 
 const word = computed(() => {
@@ -130,7 +135,7 @@ const isTargetVisible = computed(() => {
   return isPlaying.value && isDataLoaded.value && word.value.length > 0
 })
 
-const totalWords = computed(() => words.value.length)
+const totalWords = computed(() => jukugos.value.length)
 const tmpIndex = ref(0)
 
 const mistakesCount = ref(0)
@@ -155,7 +160,7 @@ const saveScore = async (totalTime: number) => {
     const wpm = (totalWords.value / (totalTime / 60000)) * 5 // Assuming 5 characters per word average
     const score = {
       user_name: localStorage.getItem('userName') || 'Anonymous',
-      score_type: 'quotes' as const,
+      score_type: 'jukugos' as const,
       wpm: wpm,
       accuracy: parseFloat(typingAccuracy.value.toString()),
       time_taken: totalTime / 1000,
@@ -194,7 +199,6 @@ const handleKeyDown = (event) => {
       currentWordIndex.value += 1
       userInput.value = ''
     } else {
-
       endTime.value = Date.now()
       const totalTime = endTime.value - startTime.value
       playSound('finish')
@@ -206,7 +210,7 @@ const handleKeyDown = (event) => {
 }
 
 const startGame = () => {
-  if (!isDataLoaded.value || words.value.length === 0) return
+  if (!isDataLoaded.value || jukugos.value.length === 0) return
 
   isPlaying.value = true
   currentWordIndex.value = 0
