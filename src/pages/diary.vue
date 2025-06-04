@@ -61,90 +61,83 @@ onMounted(() => {
   const stop = document.getElementById('stop')
   const reset = document.getElementById('reset')
 
-  let startTime
-  let timeoutId
+  let startTime: number
+  let timeoutId: number
   let elapsedtime = 0
 
-  function initial (){
-    stop.classList.add('inactive')
-    reset.classList.add('inactive')
-    start.classList.remove('inactive')
+  function initial() {
+    if (stop) stop.classList.add('inactive')
+    if (reset) reset.classList.add('inactive')
+    if (start) start.classList.remove('inactive')
   }
 
-  function running (){
-    stop.classList.remove('inactive')
-    start.classList.add('inactive')
-    reset.classList.add('inactive')
-
+  function running() {
+    if (stop) stop.classList.remove('inactive')
+    if (start) start.classList.add('inactive')
+    if (reset) reset.classList.add('inactive')
   }
 
-  function stopped (){
-    stop.classList.add('inactive')
-    reset.classList.remove('inactive')
-    start.classList.remove('inactive')
+  function stopped() {
+    if (stop) stop.classList.add('inactive')
+    if (reset) reset.classList.remove('inactive')
+    if (start) start.classList.remove('inactive')
   }
 
   initial()
 
+  if (start) {
+    start.addEventListener('click', () => {
+      if (start.classList.contains('inactive') === true) {
+        return
+      }
+
+      startTime = Date.now()
+      running()
+
+      function countUp() {
 
 
-  start.addEventListener('click', () => {
-    if (start.classList.contains('inactive') === true){
-      return
-    }
+        const d = new Date(Date.now() - startTime + elapsedtime)
+        const m = String(d.getMinutes()).padStart(2, '0')
+        const s = String(d.getSeconds()).padStart(2, '0')
+        const ms = String(d.getUTCMilliseconds()).padStart(3, '0')
 
-    startTime = Date.now()
-    running()
+        if (timer) {
+          timer.textContent = `${m}:${s}.${ms}`
+        }
+      }
 
-    function countUp (){
+      timeoutId = window.setInterval(countUp, 10)
+    })
+  }
 
+  if (stop) {
+    stop.addEventListener('click', () => {
+      if (stop && stop.classList.contains('inactive') === true) {
+        return
+      }
 
-      const d = new Date(Date.now() - startTime + elapsedtime)
-      const m = String(d.getMinutes()).padStart(2, '0')
-      const s = String(d.getSeconds()).padStart(2, '0')
-      const ms = String(d.getUTCMilliseconds()).padStart(3, '0')
+      stopped()
 
+      window.clearInterval(timeoutId)
+      elapsedtime += Date.now() - startTime
+    })
+  }
 
-      timer.textContent = `${m}:${s}.${ms}`
+  if (reset) {
+    reset.addEventListener('click', () => {
+      if (reset && reset.classList.contains('inactive') === true) {
+        return
+      }
 
+      initial()
+      if (timer) {
+        timer.textContent = '00:00.000'
+      }
 
-
-    }
-
-
-    timeoutId = setInterval(countUp, 10)
-  })
-
-
-
-  stop.addEventListener('click', () => {
-    if (stop.classList.contains('inactive') === true){
-      return
-    }
-
-
-    stopped()
-
-
-    clearTimeout(timeoutId)
-    elapsedtime += Date.now() - startTime
-
-
-  })
-
-
-
-
-  reset.addEventListener('click', () => {
-    if (reset.classList.contains('inactive') === true){
-      return
-    }
-
-    initial()
-    timer.textContent = '00:00.000'
-
-    elapsedtime = 0
-  })
+      elapsedtime = 0
+    })
+  }
 })
 
 </script>
