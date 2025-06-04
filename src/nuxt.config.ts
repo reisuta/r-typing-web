@@ -14,8 +14,8 @@ export default defineNuxtConfig({
     },
   },
   typescript: {
-    strict: false,
-    typeCheck: false,
+    strict: true,
+    typeCheck: true,
   },
   ssr: false, // SPAモードで動作
 })
