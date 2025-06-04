@@ -65,19 +65,19 @@ onMounted(() => {
   let timeoutId: number
   let elapsedtime = 0
 
-  function initial() {
+  function initial () {
     if (stop) stop.classList.add('inactive')
     if (reset) reset.classList.add('inactive')
     if (start) start.classList.remove('inactive')
   }
 
-  function running() {
+  function running () {
     if (stop) stop.classList.remove('inactive')
     if (start) start.classList.add('inactive')
     if (reset) reset.classList.add('inactive')
   }
 
-  function stopped() {
+  function stopped () {
     if (stop) stop.classList.add('inactive')
     if (reset) reset.classList.remove('inactive')
     if (start) start.classList.remove('inactive')
@@ -94,7 +94,7 @@ onMounted(() => {
       startTime = Date.now()
       running()
 
-      function countUp() {
+      function countUp () {
 
 
         const d = new Date(Date.now() - startTime + elapsedtime)
