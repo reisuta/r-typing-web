@@ -1,6 +1,6 @@
 interface ApiOptions {
   method?: 'GET' | 'POST' | 'PUT' | 'DELETE'
-  body?: unknown
+  body?: BodyInit | Record<string, any> | null
   headers?: Record<string, string>
 }
 
@@ -23,14 +23,14 @@ export const useApi = <T = unknown>(url: string, options?: ApiOptions): ApiRespo
     try {
       const response = await $fetch<T>(url, {
         method: options?.method || 'GET',
-        body: options?.body,
+        body: options?.body as any,
         headers: {
           'Accept': 'application/json',
           'Content-Type': 'application/json',
           ...options?.headers,
         },
       })
-      data.value = response as T
+      data.value = response
     } catch (e) {
       error.value = e as Error
       console.error('API Error:', e)

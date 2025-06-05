@@ -14,8 +14,8 @@ export default defineNuxtConfig({
     },
   },
   typescript: {
-    strict: false,
-    typeCheck: false,
+    strict: true,
+    typeCheck: false, // Vercel deployment compatibility
   },
   ssr: false, // SPAモードで動作
 })
