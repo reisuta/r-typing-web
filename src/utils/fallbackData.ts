@@ -9,7 +9,7 @@ export const fallbackQuotes = [
   ['waiutu', '薈蔚たる草木の中で、深呼吸をした。', '薈蔚たる草木の中で、深呼吸をした。'],
   ['utusou', '鬱蒼とした森の奥深くに、古い社が佇んでいた。', '鬱蒼とした森の奥深くに、古い社が佇んでいた。'],
   ['assen', '彼は両者の間を斡旋し、円満な解決に導いた。', '彼は両者の間を斡旋し、円満な解決に導いた。'],
-  ['yuuutu', '憂鬱な気分を振り払うため、散歩に出かけた。', '憂鬱な気分を振り払うため、散歩に出かけた。']
+  ['yuuutu', '憂鬱な気分を振り払うため、散歩に出かけた。', '憂鬱な気分を振り払うため、散歩に出かけた。'],
 ]
 
 export const fallbackKanjis = [
@@ -32,7 +32,7 @@ export const fallbackKanjis = [
   ['mon', '悶', '悩む、もだえる'],
   ['kyoku', '曲', '曲がる、まげる'],
   ['setu', '折', '折る、くじく'],
-  ['sou', '蒼', '青い、あおい']
+  ['sou', '蒼', '青い、あおい'],
 ]
 
 export const fallbackJukugos = [
@@ -55,18 +55,18 @@ export const fallbackJukugos = [
   ['gizen', '巍然', '高く大きくそびえるさま'],
   ['kituritu', '屹立', 'そびえ立つこと'],
   ['konkon', '懇懇', 'ねんごろなさま'],
-  ['monmon', '悶々', '悩み苦しむさま']
+  ['monmon', '悶々', '悩み苦しむさま'],
 ]
 
 export const getFallbackData = (dataType: 'quotes' | 'kanjis' | 'jukugos'): string[][] => {
   switch (dataType) {
-    case 'quotes':
-      return fallbackQuotes
-    case 'kanjis':
-      return fallbackKanjis
-    case 'jukugos':
-      return fallbackJukugos
-    default:
-      return fallbackQuotes
+  case 'quotes':
+    return fallbackQuotes
+  case 'kanjis':
+    return fallbackKanjis
+  case 'jukugos':
+    return fallbackJukugos
+  default:
+    return fallbackQuotes
   }
 }
