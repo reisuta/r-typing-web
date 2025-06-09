@@ -56,6 +56,7 @@
 <script setup lang="ts">
 import { useTypingData } from '~/composables/useTypingData'
 import { useScores } from '~/composables/useScores'
+import { getFallbackData } from '~/utils/fallbackData'
 
 interface Props {
   dataType: 'quotes' | 'kanjis' | 'jukugos'
@@ -88,8 +89,8 @@ async function fetchData () {
     }
   } catch (error) {
     console.error('Fetch error:', error)
-    // フォールバックデータ
-    words.value = [['test', 'テスト']]
+    // 漢検一級レベルのフォールバックデータを使用
+    words.value = getFallbackData(props.dataType)
   } finally {
     isDataLoaded.value = true
     startGame()
